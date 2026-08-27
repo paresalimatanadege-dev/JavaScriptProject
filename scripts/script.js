@@ -39,74 +39,50 @@ function afficherEmail(nom, email, score) {
     location.href = mailto
 }
 
-/**
- * Cette fonction prend un nom en paramètre et valide qu'il est au bon format
- * ici : deux caractères au minimum
- * @param {string} nom 
- * @throws {Error}
- */
-function validerNom(nom) {
-    if (nom.length < 2) {
-        throw new Error("Le nom est trop court. ")
+
+
+function verifierNom(balise){
+    let nomRegExp=new RegExp("\\w{2}")
+    if(nomRegExp.test(balise.value)===false){
+        throw new Error("Le nom est trop court")
     }
-    
 }
 
-/**
- * Cette fonction prend un email en paramètre et valide qu'il est au bon format. 
- * @param {string} email 
- * @throws {Error}
- */
-function validerEmail(email) {
-    let emailRegExp = new RegExp("[a-z0-9._-]+@[a-z0-9._-]+\\.[a-z0-9._-]+")
-    if (!emailRegExp.test(email)) {
-        throw new Error("L'email n'est pas valide.")
+function verifierEmail(balise){
+    let emailRegExp=new RegExp("[a-z0-9._-]+@[a-z0-9._-]+\.[a-z0-9._-]+")
+    if(emailRegExp.test(balise.value)===false){
+        throw new Error("L e-mail n est pas valide")
     }
-    
 }
 
-/**
- * Cette fonction affiche le message d'erreur passé en paramètre. 
- * Si le span existe déjà, alors il est réutilisé pour ne pas multiplier
- * les messages d'erreurs. 
- * @param {string} message 
- */
-function afficherMessageErreur(message) {
-    
-    let spanErreurMessage = document.getElementById("erreurMessage")
+function gererFormulaire(scoreEmail){
+        try{
+           
+            let baliseNom=document.getElementById("nom")
+            nom=baliseNom.value
+            verifierNom(baliseNom)
+            let baliseEmail=document.getElementById("email")
+            email=baliseEmail.value
+            verifierEmail(baliseEmail)
+            afficherEmail(nom,email,scoreEmail)    
+            afficherMessageErreur("")   
+        }
+        catch(erreur){
+            console.log("erreur")
+            afficherMessageErreur(erreur.message)
+        }
 
-    if (!spanErreurMessage) {
-        let popup = document.querySelector(".popup")
-        spanErreurMessage = document.createElement("span")
-        spanErreurMessage.id = "erreurMessage"
-        
-        popup.append(spanErreurMessage)
-    }
-    
-    spanErreurMessage.innerText = message
 }
 
-/**
- * Cette fonction permet de récupérer les informations dans le formulaire
- * de la popup de partage et d'appeler l'affichage de l'email avec les bons paramètres.
- * @param {string} scoreEmail 
- */
-function gererFormulaire(scoreEmail) {
-    try {
-        let baliseNom = document.getElementById("nom")
-        let nom = baliseNom.value
-        validerNom(nom)
-    
-        let baliseEmail = document.getElementById("email")
-        let email = baliseEmail.value
-        validerEmail(email)
-        afficherMessageErreur("")
-        afficherEmail(nom, email, scoreEmail)
-
-    } catch(erreur) {
-        afficherMessageErreur(erreur.message)
+function afficherMessageErreur(message){
+    popup=document.querySelector(".popup")
+    let messageErreur=document.getElementById("erreurMessage")
+    if(!messageErreur){
+        messageErreur=document.createElement("span")
+        messageErreur.id="erreurMessage"
+        popup.append(messageErreur)
     }
-    
+    messageErreur.innerText=message
 }
 
 /**
@@ -121,9 +97,7 @@ function lancerJeu() {
     let listeProposition = listeMots
 
     let btnValiderMot = document.getElementById("btnValiderMot")
-    let listeBtnRadio = document.querySelectorAll(".optionSource input")
     let inputEcriture = document.getElementById("inputEcriture")
-
 
     afficherProposition(listeProposition[i])
 
@@ -137,20 +111,14 @@ function lancerJeu() {
         inputEcriture.value = ''
         if (listeProposition[i] === undefined) {
             afficherProposition("Le jeu est fini")
-            // On désactive le bouton valider
             btnValiderMot.disabled = true
-            // On désactive les boutons radios
-            for (let indexBtnRadio = 0; indexBtnRadio < listeBtnRadio.length; indexBtnRadio++) {
-                listeBtnRadio[indexBtnRadio].disabled = true
-            }
-
         } else {
             afficherProposition(listeProposition[i])
         }
     })
 
     // Gestion de l'événement change sur les boutons radios. 
-    
+    let listeBtnRadio = document.querySelectorAll(".optionSource input")
     for (let index = 0; index < listeBtnRadio.length; index++) {
         listeBtnRadio[index].addEventListener("change", (event) => {
             // Si c'est le premier élément qui a été modifié, alors nous voulons
@@ -166,13 +134,34 @@ function lancerJeu() {
         })
     }
 
-    // Gestion de l'événement submit sur le formulaire de partage. 
-    let form = document.querySelector("form")
-    form.addEventListener("submit", (event) => {
-        event.preventDefault()
-        let scoreEmail = `${score} / ${i}`
-        gererFormulaire(scoreEmail)
+    inputEcriture.addEventListener("keydown",(event)=>{
+            if (event.key==="Enter"){
+            if(inputEcriture.value===listeProposition[i]){
+                score++
+            }
+            i++
+            majScore(score,i)
+            inputEcriture.value=""
+            if(i<listeProposition.length){
+                afficherProposition(listeProposition[i])
+            }
+            else{
+                afficherProposition("Le jeu est terminé")
+                botonValider.disabled=true
+            }
+            }
     })
 
     afficherResultat(score, i)
+
+    initAddEventListenerPopup()
+
+    const formPartage=document.querySelector(".formPartage")
+    formPartage.addEventListener("submit",(event)=>{
+        event.preventDefault()
+        scoreEmail=`${score}/${i}`
+        gererFormulaire(scoreEmail)
+    })
+    
+
 }
