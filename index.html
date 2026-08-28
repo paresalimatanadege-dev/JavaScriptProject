@@ -20,13 +20,13 @@
     <header>
         <h1>AzerType</h1>
         <h2>L'application pour écrire plus vite !</h2>
-        <h3>AzerType est une application en ligne pour apprendre à taper plus vite au clavier :)</h3>
+        <h3>AzerType est une application en ligne pour apprendre à taper plus vite au clavier :</h3>
     </header>
 
     <!-- MAIN -->
     <main>
         <div class="zoneOptions">
-            <p>Choisissez votre option et tapez la proposition qui s'affiche dans le champ en-dessous.</p>
+            <p id="zoneOptionsp"></p>
             <div class="optionSource">
                 <input type="radio" name="optionSource" id="mots" value="1" checked>
                 <label for="mots">Mots</label>
@@ -35,13 +35,13 @@
             </div>
         </div>
 
-        <div class="zoneProposition">
+        <div id="zoneProposition">
             Azerty
         </div>
 
         <div class="zoneSaisie">
             <input type="text" id="inputEcriture" name="inputEcriture">
-            <button id="btnValiderMot">Valider</button>
+            <button id="btnValiderMot"></button>
         </div>
 
         <div class="zoneScore">
